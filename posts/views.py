@@ -14,6 +14,7 @@ class PostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         published_status = Status.objects.get(name="publish")
+        context["list_title"] = "Publish"
         context["post_list"] = Post.objects.filter(
             status = published_status
         ).order_by("created_on").reverse()
@@ -26,11 +27,25 @@ class DraftPostListView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         draft_status = Status.objects.get(name="draft")
+        context["list_title"] = "Draft"
         context["post_list"] = Post.objects.filter(
             status = draft_status
         ).filter(
             author = self.request.user
             ).order_by("created_on").reverse()
+        return context
+
+class ArchivedPostListView(LoginRequiredMixin, ListView):
+    template_name = "posts/list.html"
+    model = Post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        archived_status = Status.objects.get(name="archived")
+        context["list_ title"] = "Archived"
+        context["post_list"] =  Post.objects.filter(
+            status=archived_status
+        ).order_by("created_on").reverse()
         return context
 
 class PostDetailView(DetailView):
